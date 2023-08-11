@@ -39,7 +39,7 @@ import { CONFIG } from './infra/config/config';
     JwtModule.register({
       global: true,
       secret: CONFIG.PARAMS.AUTH.JWT_SECRET,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '61s' },
     }),
   ],
   controllers: [AppController],

@@ -1,0 +1,17 @@
+{
+      "apps/**/*.{ts,js}": [
+        "prettier --write",
+        "eslint --fix",
+      ],
+      "libs/**/*.{ts,js}": [
+        "prettier --write",
+        "eslint --fix",
+      ],
+      "docs/**/*.{md}": [
+        "prettier --write",
+      ],
+      "README.md": [
+        "prettier --write",
+      ],
+}
+
