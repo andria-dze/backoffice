@@ -3,23 +3,23 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as dotenv from 'dotenv';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './domain/auth/auth.module';
 import { UsersModule } from './domain/users/users.module';
-
-dotenv.config();
+import { CONFIG } from './infra/config/config';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      port: Number(process.env.DATABASE_PORT),
-      host: process.env.DATABASE_HOST,
-      username: process.env.DATABASE_USER,
-      password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE_NAME,
+      port: CONFIG.PARAMS.DATABASE.PORT,
+      host: CONFIG.PARAMS.DATABASE.HOST,
+      username: CONFIG.PARAMS.DATABASE.USERNAME,
+      password: CONFIG.PARAMS.DATABASE.PASSWORD,
+      database: CONFIG.PARAMS.DATABASE.NAME,
       autoLoadEntities: true,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -35,6 +35,12 @@ dotenv.config();
       },
     }),
     UsersModule,
+    AuthModule,
+    JwtModule.register({
+      global: true,
+      secret: CONFIG.PARAMS.AUTH.JWT_SECRET,
+      signOptions: { expiresIn: '60s' },
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
