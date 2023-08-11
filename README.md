@@ -30,6 +30,8 @@
 
 ```bash
 $ yarn install
+$ yarn docker compose up -d
+$ yarn migration
 ```
 
 ## Running the app
