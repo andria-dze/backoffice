@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { hashInput } from '../../infra/utils/bcrypt';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
@@ -12,8 +13,22 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  create(createUserInput: CreateUserInput) {
-    return `This action adds a new user -  createUserInput ${createUserInput}`;
+  async create(createUserInput: CreateUserInput) {
+    if (createUserInput.password !== createUserInput.confirmPassword) {
+      throw new BadRequestException(`passwords don't match`);
+    }
+    const hashedPassword = await hashInput(createUserInput.password);
+    const newUser = await this.usersRepository.save({
+      email: createUserInput.email,
+      firstName: createUserInput.firstName,
+      lastName: createUserInput.lastName,
+      password: hashedPassword,
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...response } = newUser;
+
+    return response;
   }
 
   findAll(): Promise<User[]> {

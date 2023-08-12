@@ -1,8 +1,11 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { GraphqlAuthGuard } from '../auth/guards/graphql-auth-guard.service';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { UsersService } from './users.service';
 
+@UseGuards(GraphqlAuthGuard)
 @Resolver('User')
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}

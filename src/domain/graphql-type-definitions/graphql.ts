@@ -8,15 +8,27 @@
 /* eslint-disable */
 
 export interface CreateUserInput {
-    exampleField?: Nullable<number>;
+    firstName: string;
+    lastName: string;
+    password: string;
+    confirmPassword: string;
+    email: string;
 }
 
 export interface UpdateUserInput {
     id: number;
+    firstName?: Nullable<string>;
+    lastName?: Nullable<string>;
+    password?: Nullable<string>;
+    confirmPassword?: Nullable<string>;
+    email?: Nullable<string>;
 }
 
 export interface User {
-    exampleField?: Nullable<number>;
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
 }
 
 export interface IQuery {
