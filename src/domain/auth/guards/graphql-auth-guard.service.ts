@@ -4,18 +4,32 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { CONFIG } from '../../../infra/config/config';
+import { CONFIG } from '../../../common/config/config';
+import { IS_PUBLIC_KEY } from './public-guard.service';
 
 @Injectable()
 export class GraphqlAuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private reflector: Reflector,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
     const req: Request = ctx.getContext().req; // Access the Express Request object
+
+    const isPublic = this.reflector.get<boolean>(
+      IS_PUBLIC_KEY,
+      context.getHandler(),
+    );
+
+    if (isPublic || CONFIG.PARAMS.APP.ENV === 'dev') {
+      return true;
+    }
 
     // Check if the authorization header is present
     const authHeader = req.headers['authorization'];

@@ -1,16 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { hashInput } from '../../infra/utils/bcrypt';
-import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
-import { User } from './entities/user.entity';
+import { paginate } from '../../common/paginate/paginate';
+import { hashInput } from '../../common/utils/bcrypt';
+import { UserEntity } from './entities/user.entity';
+import { CreateUserInput } from './inputs/create-user.input';
+import { UpdateUserInput } from './inputs/update-user.input';
+import { GetUsersArgs, UserConnection } from './models/user';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private usersRepository: Repository<UserEntity>,
   ) {}
 
   async create(createUserInput: CreateUserInput) {
@@ -31,15 +33,20 @@ export class UsersService {
     return response;
   }
 
-  findAll(): Promise<User[]> {
+  findAll(): Promise<UserEntity[]> {
     return this.usersRepository.find();
   }
 
-  findOne(id: number): Promise<User | null> {
+  async find(args: GetUsersArgs): Promise<UserConnection> {
+    const qb = this.usersRepository.createQueryBuilder();
+    return await paginate(qb, args);
+  }
+
+  findOne(id: number): Promise<UserEntity | null> {
     return this.usersRepository.findOneBy({ id });
   }
 
-  findOneByEmail(email: string): Promise<User | null> {
+  findOneByEmail(email: string): Promise<UserEntity | null> {
     return this.usersRepository.findOneBy({ email });
   }
 

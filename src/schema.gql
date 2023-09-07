@@ -1,0 +1,50 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+}
+
+type UserEdge {
+  cursor: String!
+  node: User!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String!
+  endCursor: String!
+}
+
+type UserConnection {
+  edges: [UserEdge!]
+  pageInfo: PageInfo
+}
+
+type Query {
+  users(first: Int, after: String, last: Int, before: String): UserConnection!
+  user(id: Float!): User
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Float!): User!
+}
+
+input CreateUserInput {
+  email: String!
+  password: String!
+  confirmPassword: String!
+  firstName: String!
+  lastName: String!
+}
+
+input UpdateUserInput {
+  id: Float!
+}

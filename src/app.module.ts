@@ -7,9 +7,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CONFIG } from './common/config/config';
 import { AuthModule } from './domain/auth/auth.module';
 import { UsersModule } from './domain/users/users.module';
-import { CONFIG } from './infra/config/config';
 
 @Module({
   imports: [
@@ -26,13 +26,7 @@ import { CONFIG } from './infra/config/config';
       driver: ApolloDriver,
       playground: false,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
-      typePaths: ['./**/*.graphql'],
-      definitions: {
-        path: path.join(
-          process.cwd(),
-          'src/domain/graphql-type-definitions/graphql.ts',
-        ),
-      },
+      autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
     }),
     UsersModule,
     AuthModule,

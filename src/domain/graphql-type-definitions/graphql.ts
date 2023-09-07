@@ -16,7 +16,7 @@ export interface CreateUserInput {
 }
 
 export interface UpdateUserInput {
-    id: number;
+    id: string;
     firstName?: Nullable<string>;
     lastName?: Nullable<string>;
     password?: Nullable<string>;
@@ -24,22 +24,43 @@ export interface UpdateUserInput {
     email?: Nullable<string>;
 }
 
-export interface User {
+export interface Node {
+    id: string;
+}
+
+export interface User extends Node {
     id: string;
     firstName: string;
     lastName: string;
     email: string;
 }
 
+export interface UserEdge {
+    node?: Nullable<User>;
+    cursor: string;
+}
+
+export interface PageInfo {
+    hasNextPage: boolean;
+    endCursor?: Nullable<string>;
+    hasPreviousPage: boolean;
+    startCursor?: Nullable<string>;
+}
+
+export interface UserConnection {
+    pageInfo: PageInfo;
+    edges?: Nullable<Nullable<UserEdge>[]>;
+}
+
 export interface IQuery {
-    users(): Nullable<User>[] | Promise<Nullable<User>[]>;
-    user(id: number): Nullable<User> | Promise<Nullable<User>>;
+    users(first?: Nullable<number>, after?: Nullable<string>, last?: Nullable<number>, before?: Nullable<string>): UserConnection | Promise<UserConnection>;
+    user(id: string): Nullable<User> | Promise<Nullable<User>>;
 }
 
 export interface IMutation {
     createUser(createUserInput: CreateUserInput): User | Promise<User>;
     updateUser(updateUserInput: UpdateUserInput): User | Promise<User>;
-    removeUser(id: number): Nullable<User> | Promise<Nullable<User>>;
+    removeUser(id: string): Nullable<User> | Promise<Nullable<User>>;
 }
 
 type Nullable<T> = T | null;

@@ -1,8 +1,10 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { GraphqlAuthGuard } from '../auth/guards/graphql-auth-guard.service';
-import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
+import { Public } from '../auth/guards/public-guard.service';
+import { CreateUserInput } from './inputs/create-user.input';
+import { UpdateUserInput } from './inputs/update-user.input';
+import { GetUsersArgs, User, UserConnection } from './models/user';
 import { UsersService } from './users.service';
 
 @UseGuards(GraphqlAuthGuard)
@@ -10,28 +12,29 @@ import { UsersService } from './users.service';
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
-  @Mutation('createUser')
-  create(@Args('createUserInput') createUserInput: CreateUserInput) {
+  @Mutation(() => User)
+  @Public()
+  createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
     return this.usersService.create(createUserInput);
   }
 
-  @Query('users')
-  findAll() {
-    return this.usersService.findAll();
+  @Query(() => UserConnection)
+  users(@Args() args: GetUsersArgs) {
+    return this.usersService.find(args);
   }
 
-  @Query('user')
-  findOne(@Args('id') id: number) {
+  @Query(() => User, { nullable: true })
+  user(@Args('id') id: number): Promise<User | null> {
     return this.usersService.findOne(id);
   }
 
-  @Mutation('updateUser')
-  update(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
+  @Mutation(() => User)
+  updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
     return this.usersService.update(updateUserInput.id, updateUserInput);
   }
 
-  @Mutation('removeUser')
-  remove(@Args('id') id: number) {
+  @Mutation(() => User)
+  removeUser(@Args('id') id: number) {
     return this.usersService.remove(id);
   }
 }
