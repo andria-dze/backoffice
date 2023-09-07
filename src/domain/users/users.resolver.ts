@@ -19,7 +19,7 @@ export class UsersResolver {
   }
 
   @Query(() => UserConnection)
-  users(@Args() args: GetUsersArgs) {
+  users(@Args() args: GetUsersArgs): Promise<UserConnection> {
     return this.usersService.find(args);
   }
 
@@ -29,12 +29,14 @@ export class UsersResolver {
   }
 
   @Mutation(() => User)
-  updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
+  updateUser(
+    @Args('updateUserInput') updateUserInput: UpdateUserInput,
+  ): string {
     return this.usersService.update(updateUserInput.id, updateUserInput);
   }
 
   @Mutation(() => User)
-  removeUser(@Args('id') id: number) {
+  removeUser(@Args('id') id: number): Promise<void> {
     return this.usersService.remove(id);
   }
 }

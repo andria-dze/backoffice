@@ -53,25 +53,13 @@ export async function paginate(
 
   let countBefore = 0;
   let countAfter = 0;
-  if (
-    beforeQuery.expressionMap.wheres &&
-    beforeQuery.expressionMap.wheres.length
-  ) {
-    countBefore = await beforeQuery
-      .andWhere(`${cursorColumn} < :cursor`, { cursor: startCursorId })
-      .getCount();
-    countAfter = await afterQuery
-      .andWhere(`${cursorColumn} > :cursor`, { cursor: endCursorId })
-      .getCount();
-  } else {
-    countBefore = await beforeQuery
-      .where(`${cursorColumn} < :cursor`, { cursor: startCursorId })
-      .getCount();
 
-    countAfter = await afterQuery
-      .where(`${cursorColumn} > :cursor`, { cursor: endCursorId })
-      .getCount();
-  }
+  countBefore = await beforeQuery
+    .andWhere(`${cursorColumn} < :cursor`, { cursor: startCursorId })
+    .getCount();
+  countAfter = await afterQuery
+    .andWhere(`${cursorColumn} > :cursor`, { cursor: endCursorId })
+    .getCount();
 
   const edges = result.map((value) => {
     return {
