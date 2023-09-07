@@ -66,6 +66,10 @@ export async function paginate(
   const hasNextPage = edges.length > limit;
   const hasPreviousPage = countBefore > 0;
 
+  if (hasNextPage) {
+    edges.pop();
+  }
+
   const pageInfo: IPageInfo = {
     startCursor: edges.length > 0 ? edges[0].cursor : null,
     endCursor: edges.length > 0 ? edges.slice(-1)[0].cursor : null,
