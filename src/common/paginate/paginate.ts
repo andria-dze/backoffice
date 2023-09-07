@@ -13,6 +13,8 @@ export async function paginate(
 
   const totalCountQuery = query.clone();
 
+  let limit = paginationArgs.first ?? defaultLimit;
+
   // FORWARD pagination
   if (paginationArgs.first) {
     if (paginationArgs.after) {
@@ -23,9 +25,7 @@ export async function paginate(
       query.where({ [cursorColumn]: MoreThan(offsetId) });
     }
 
-    const limit = paginationArgs.first ?? defaultLimit;
-
-    query.take(limit);
+    limit = paginationArgs.first ?? defaultLimit;
   }
 
   // REVERSE pagination
@@ -35,31 +35,26 @@ export async function paginate(
     );
     logger.verbose(`Paginate BeforeID: ${offsetId}`);
 
-    const limit = paginationArgs.last ?? defaultLimit;
+    limit = paginationArgs.last ?? defaultLimit;
 
-    query.where({ [cursorColumn]: LessThan(offsetId) }).take(limit);
+    query.where({ [cursorColumn]: LessThan(offsetId) });
   }
+  // We take limit + 1 to figure out if hasNextPage
+  query.take(limit + 1);
 
   const result = await query.getMany();
 
   const startCursorId: number =
     result.length > 0 ? result[0][cursorColumn] : null;
-  const endCursorId: number =
-    result.length > 0 ? result.slice(-1)[0][cursorColumn] : null;
-
-  const beforeQuery = totalCountQuery.clone();
-
-  const afterQuery = beforeQuery.clone();
 
   let countBefore = 0;
-  let countAfter = 0;
 
-  countBefore = await beforeQuery
-    .andWhere(`${cursorColumn} < :cursor`, { cursor: startCursorId })
-    .getCount();
-  countAfter = await afterQuery
-    .andWhere(`${cursorColumn} > :cursor`, { cursor: endCursorId })
-    .getCount();
+  if (paginationArgs.after || paginationArgs.before) {
+    const beforeQuery = totalCountQuery.clone();
+    countBefore = await beforeQuery
+      .andWhere(`${cursorColumn} < :cursor`, { cursor: startCursorId })
+      .getCount();
+  }
 
   const edges = result.map((value) => {
     return {
@@ -68,11 +63,14 @@ export async function paginate(
     };
   });
 
+  const hasNextPage = edges.length > limit;
+  const hasPreviousPage = countBefore > 0;
+
   const pageInfo: IPageInfo = {
     startCursor: edges.length > 0 ? edges[0].cursor : null,
     endCursor: edges.length > 0 ? edges.slice(-1)[0].cursor : null,
-    hasNextPage: countAfter > 0,
-    hasPreviousPage: countBefore > 0,
+    hasNextPage,
+    hasPreviousPage,
   };
 
   return { edges, pageInfo };
