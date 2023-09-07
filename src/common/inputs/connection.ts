@@ -30,13 +30,13 @@ export function Connection<T>(classRef: Type<T>): Type<IConnectionType<T>> {
   }
   @ObjectType()
   abstract class PageInfo {
-    @Field(() => Boolean)
+    @Field(() => Boolean, { nullable: true })
     hasNextPage!: boolean;
-    @Field(() => Boolean)
+    @Field(() => Boolean, { nullable: true })
     hasPreviousPage!: boolean;
-    @Field(() => String)
+    @Field(() => String, { nullable: true })
     startCursor!: string;
-    @Field(() => String)
+    @Field(() => String, { nullable: true })
     endCursor!: string;
   }
 
