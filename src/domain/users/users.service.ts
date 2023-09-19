@@ -50,8 +50,16 @@ export class UsersService {
     return this.usersRepository.findOneBy({ email });
   }
 
-  update(id: number, updateUserInput: UpdateUserInput) {
-    return `This action updates a #${id} user - updateUserInput ${updateUserInput}`;
+  async update(
+    id: number,
+    updateUserInput: UpdateUserInput,
+  ): Promise<UserEntity> {
+    const user = await this.usersRepository.findOneByOrFail({ id });
+
+    Object.assign(user, updateUserInput);
+    await this.usersRepository.save(user);
+
+    return user;
   }
 
   async remove(id: number): Promise<void> {
